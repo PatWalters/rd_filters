@@ -1,6 +1,6 @@
 #### rd_filters.py
 
-This Script provides a simple means of applying the 
+This script provides a simple means of applying the 
 functional group filters from the ChEMBL database, as well as a number of 
 property  filters from the RDKit, to a set 
 of compounds.  As of ChEMBL 23,  the database table **structural_alerts**
