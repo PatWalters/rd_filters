@@ -3,7 +3,7 @@
 This Script provides a simple means of applying the 
 functional group filters from the ChEMBL database, as well as a number of 
 property  filters from the RDKit, to a set 
-of compounds.  As of ChEMBL 21,  the database table **structural_alerts**
+of compounds.  As of ChEMBL 23,  the database table **structural_alerts**
 contains 8 sets of alerts.  ChEMBL doesn't apper to have much in the way of 
 documentation on the different alert sets. 
 
