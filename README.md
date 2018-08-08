@@ -101,7 +101,7 @@ Just edit the file with your [favorite text editor](https://www.gnu.org/software
 
 First off, you're going to want to copy **alert_collection.csv** and 
 **rules.json** to a directory and set the FILTER_RULES_DATA environment
-variable to point to that directory.  If your using a bash-ish shell
+variable to point to that directory.  If you are using a bash-ish shell
 and the files are in /home/elvis/data that would be: 
 ```
 export FILTER_RULES_DATA=/home/elvis/data
