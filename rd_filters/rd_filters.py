@@ -10,10 +10,12 @@ import pandas as pd
 import os
 import json
 from docopt import docopt
+import pkg_resources
+
 
 cmd_str = """Usage:
-rd_filters.py filter --in INPUT_FILE --prefix PREFIX [--rules RULES_FILE_NAME] [--alerts ALERT_FILE_NAME][--np NUM_CORES]
-rd_filters.py template --out TEMPLATE_FILE [--rules RULES_FILE_NAME]
+rd_filters filter --in INPUT_FILE --prefix PREFIX [--rules RULES_FILE_NAME] [--alerts ALERT_FILE_NAME][--np NUM_CORES]
+rd_filters template --out TEMPLATE_FILE [--rules RULES_FILE_NAME]
 
 Options:
 --in INPUT_FILE input file name
@@ -77,7 +79,7 @@ def default_rule_template(alert_list, file_name):
 
 def get_config_file(file_name, environment_variable):
     """
-    Read a configuration file, first look for the file in the current directory, if you can't find
+    Read a configuration file, first look for the file, if you can't find
     it there, look in the directory pointed to by environment_variable
     :param file_name: the configuration file
     :param environment_variable: the environment variable
@@ -92,12 +94,12 @@ def get_config_file(file_name, environment_variable):
             if os.path.exists(config_file_path):
                 return config_file_path
 
-    error_list = [f"Could not file {file_name} in the current directory"]
+    error_list = [f"Could not file {file_name}"]
     if config_dir:
         err_str = f"Could not find {config_file_path} based on the {environment_variable}" + \
                   "environment variable"
         error_list.append(err_str)
-    error_list.append(f"Please put {file_name} in the current directory")
+    error_list.append(f"Please check {file_name} exists")
     error_list.append(f"Or in the directory pointed to by the {environment_variable} environment variable")
     print("\n".join(error_list))
     sys.exit(1)
@@ -152,7 +154,7 @@ class RDFilters:
 
 def main():
     cmd_input = docopt(cmd_str)
-    alert_file_name = cmd_input.get("--alerts") or "alert_collection.csv"
+    alert_file_name = cmd_input.get("--alerts") or pkg_resources.resource_filename('rd_filters', "data/alert_collection.csv")
     rf = RDFilters(alert_file_name)
 
     if cmd_input.get("template"):
@@ -161,7 +163,7 @@ def main():
 
     elif cmd_input.get("filter"):
         input_file_name = cmd_input.get("--in")
-        rules_file_name = cmd_input.get("--rules") or "rules.json"
+        rules_file_name = cmd_input.get("--rules") or pkg_resources.resource_filename('rd_filters', "data/rules.json")
         rules_file_path = get_config_file(rules_file_name, "FILTER_RULES_DATA")
         prefix_name = cmd_input.get("--prefix")
         num_cores = cmd_input.get("--np") or mp.cpu_count()
