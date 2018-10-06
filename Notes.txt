@@ -9,8 +9,8 @@ The file alert_collection.csv contains the edited SMARTS where applicable.
 
 rule 194
 [F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$(CF2)]-[N,n]
-The RDKit isn't happy when CF2 is not in brackets make it [CF2]
-[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$([CF2])]-[N,n]
+As Andrew Dalke pointed out, CF2 should actually be C(F)F
+[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$(C(F)F)]-[N,n]
 
 
 rule 196
