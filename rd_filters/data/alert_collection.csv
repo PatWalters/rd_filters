@@ -192,7 +192,7 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 191,3,aldehyde,"[C,c][C;H1](=O)",BMS,7,0
 192,3,alpha_dicarbonyl,C(=O)!@C(=O),BMS,7,0
 193,3,alpha_halo_EWG,"[$(C(F)(F)(F)),$(C#N),$(N(=O)(=O)),$([N+](=O)[O-])]-[CH,CH2]-[Cl,Br,I,$(O(S(=O)(=O)))]",BMS,7,0
-194,3,alpha_halo_amine,"[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$([CF2])]-[N,n]",BMS,7,0
+194,3,alpha_halo_amine,"[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$(C(F)F]-[N,n]",BMS,7,0
 195,3,alpha_halo_carbonyl,"C(=O)([CH,CH2][Cl,Br,I,$(O(S(=O)(=O)))])",BMS,7,0
 196,3,alpha_halo_heteroatom,"[N,n,O,S;!$(S(=O)(=O))]-[CH,CH2;!$([CF2])][F,Cl,Br,I,$(O(S(=O)(=O)))]",BMS,7,0
 197,3,alpha_halo_heteroatom_tert,"[N,n,O,S;!$(S(=O)(=O))]-C([Cl,Br,I,$(O(S(=O)(=O)))])(C)(C)",BMS,7,0
