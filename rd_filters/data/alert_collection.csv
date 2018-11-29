@@ -192,9 +192,9 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 191,3,aldehyde,"[C,c][C;H1](=O)",BMS,7,0
 192,3,alpha_dicarbonyl,C(=O)!@C(=O),BMS,7,0
 193,3,alpha_halo_EWG,"[$(C(F)(F)(F)),$(C#N),$(N(=O)(=O)),$([N+](=O)[O-])]-[CH,CH2]-[Cl,Br,I,$(O(S(=O)(=O)))]",BMS,7,0
-194,3,alpha_halo_amine,"[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$(C(F)F]-[N,n]",BMS,7,0
+194,3,alpha_halo_amine,"[F,Cl,Br,I,$(O(S(=O)(=O)))]-[CH,CH2;!$(C(F)F)]-[N,n]",BMS,7,0
 195,3,alpha_halo_carbonyl,"C(=O)([CH,CH2][Cl,Br,I,$(O(S(=O)(=O)))])",BMS,7,0
-196,3,alpha_halo_heteroatom,"[N,n,O,S;!$(S(=O)(=O))]-[CH,CH2;!$([CF2])][F,Cl,Br,I,$(O(S(=O)(=O)))]",BMS,7,0
+196,3,alpha_halo_heteroatom,"[N,n,O,S;!$(S(=O)(=O))]-[CH,CH2;!$(C(F)(F))][F,Cl,Br,I,$(O(S(=O)(=O)))]",BMS,7,0
 197,3,alpha_halo_heteroatom_tert,"[N,n,O,S;!$(S(=O)(=O))]-C([Cl,Br,I,$(O(S(=O)(=O)))])(C)(C)",BMS,7,0
 198,3,anhydride,"[$(C(=O)),$(C(=S))]-[O,S]-[$(C(=O)),$(C(=S)),$(C(=[N;!R])),$(C(=N(-[C;X4])))]",BMS,7,0
 199,3,aryl_phosphonate,P(=O)-[O;!R]-a,BMS,7,0
@@ -243,7 +243,7 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 242,3,gte_5_phenolic_OH,a[O;D1].a[O;D1].a[O;D1].a[O;D1].a[O;D1],BMS,7,0
 243,3,gte_7_aliphatic_OH,C[O;D1].C[O;D1].C[O;D1].C[O;D1].C[O;D1].C[O;D1].C[O;D1],BMS,7,0
 244,3,gte_7_total_hal,"[Cl,Br,I].[Cl,Br,I].[Cl,Br,I].[Cl,Br,I].[Cl,Br,I].[Cl,Br,I].[Cl,Br,I]",BMS,7,0
-245,3,gte_8_CF2_or_CH2,"[CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0][CH2,$([CF2]);R0]",BMS,7,0
+245,3,gte_8_CF2_or_CH2,"[CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0][CH2,$(C(F)(F));R0]",BMS,7,0
 246,3,halo_5heterocycle_bis_EWG,"[#7,#8,#16]1[#6]([$(S(=O)(=O)),$([F,Cl]),$(C(F)(F)(F)),$(C#N),$(N(=O)(=O)),$([N+](=O)[O-]),$(C(=O))])[#6]([$(S(=O)(=O)),$([F,Cl]),$(C(F)(F)(F)),$(C#N),$(N(=O)(=O)),$([N+](=O)[O-]),$(C(=O))])[#7][#6]1([Cl,Br,I])",BMS,7,0
 247,3,halo_acrylate,"[$([C;H2]),$([C&H1;$(C-F)]),$([C&H1;$(C-Cl)]),$([C&H1;$(C-Br)]),$([C&H1;$(CI)]),$(C(F)F),$(C(Cl)Cl),$(C(Br)Br),$(C(I)I),$(C(F)Cl),$(C(F)Br),$(C(F)I),$(C(Cl)Br),$(C(Br)I)](=[$([C&H1;$(C(-C(=O)))]),$(C(F)(C(=O))),$(C(Cl)(C(=O))),$(C(Br)(C(=O))),$(C(I)(C(=O))),$(C(C)(C(=O))),$(C(c)(C(=O)))])",BMS,7,0
 248,3,halo_imino,"C(=[#7])([Cl,Br,I,$(O(S(=O)(=O)))])",BMS,7,0
