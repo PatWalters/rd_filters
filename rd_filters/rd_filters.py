@@ -171,7 +171,7 @@ def main():
 
         print("using %d cores" % num_cores, file=sys.stderr)
         start_time = time.time()
-        p = Pool(mp.cpu_count())
+        p = Pool(num_cores)
         input_data = [x.split() for x in open(input_file_name)]
         input_data = [x for x in input_data if len(x) == 2]
         rule_dict = read_rules(rules_file_path)
