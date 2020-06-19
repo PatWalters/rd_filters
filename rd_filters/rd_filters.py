@@ -3,6 +3,7 @@
 import sys
 from rdkit import Chem
 from rdkit.Chem.Descriptors import MolWt, MolLogP, NumHDonors, NumHAcceptors, TPSA
+from rdkit.Chem.rdMolDescriptors import CalcNumRotatableBonds
 import multiprocessing as mp
 from multiprocessing import Pool
 import time
@@ -67,7 +68,8 @@ def default_rule_template(alert_list, file_name):
         "LogP": [-5, 5],
         "HBD": [0, 5],
         "HBA": [0, 10],
-        "TPSA": [0, 200]
+        "TPSA": [0, 200],
+        "Rot": [0,10]
     }
     for rule_name in alert_list:
         if rule_name == "Inpharmatica":
@@ -144,7 +146,7 @@ class RDFilters:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return [smiles, name, 'INVALID', -999, -999, -999, -999, -999]
-        desc_list = [MolWt(mol), MolLogP(mol), NumHDonors(mol), NumHAcceptors(mol), TPSA(mol)]
+        desc_list = [MolWt(mol), MolLogP(mol), NumHDonors(mol), NumHAcceptors(mol), TPSA(mol), CalcNumRotatableBonds(mol)]
         for row in self.rule_list:
             patt, max_val, desc = row
             if len(mol.GetSubstructMatches(patt)) > max_val:
@@ -175,20 +177,25 @@ def main():
         input_data = [x.split() for x in open(input_file_name)]
         input_data = [x for x in input_data if len(x) == 2]
         rule_dict = read_rules(rules_file_path)
+        print(rules_file_path)
+        buff = open(rules_file_path).read()
+        print(buff)
+        print(rule_dict.keys())
 
         rule_list = [x.replace("Rule_", "") for x in rule_dict.keys() if x.startswith("Rule") and rule_dict[x]]
         rule_str = " and ".join(rule_list)
         print(f"Using alerts from {rule_str}", file=sys.stderr)
         rf.build_rule_list(rule_list)
         res = list(p.map(rf.evaluate, input_data))
-        df = pd.DataFrame(res, columns=["SMILES", "NAME", "FILTER", "MW", "LogP", "HBD", "HBA", "TPSA"])
+        df = pd.DataFrame(res, columns=["SMILES", "NAME", "FILTER", "MW", "LogP", "HBD", "HBA", "TPSA","Rot"])
         df_ok = df[
             (df.FILTER == "OK") &
             df.MW.between(*rule_dict["MW"]) &
             df.LogP.between(*rule_dict["LogP"]) &
             df.HBD.between(*rule_dict["HBD"]) &
             df.HBA.between(*rule_dict["HBA"]) &
-            df.TPSA.between(*rule_dict["TPSA"])
+            df.TPSA.between(*rule_dict["TPSA"]) &
+            df.Rot.between(*rule_dict["Rot"])
             ]
         output_smiles_file = prefix_name + ".smi"
         output_csv_file = prefix_name + ".csv"
