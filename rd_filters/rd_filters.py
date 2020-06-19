@@ -13,7 +13,6 @@ import json
 from docopt import docopt
 import pkg_resources
 
-
 cmd_str = """Usage:
 rd_filters filter --in INPUT_FILE --prefix PREFIX [--rules RULES_FILE_NAME] [--alerts ALERT_FILE_NAME][--np NUM_CORES]
 rd_filters template --out TEMPLATE_FILE [--rules RULES_FILE_NAME]
@@ -69,7 +68,7 @@ def default_rule_template(alert_list, file_name):
         "HBD": [0, 5],
         "HBA": [0, 10],
         "TPSA": [0, 200],
-        "Rot": [0,10]
+        "Rot": [0, 10]
     }
     for rule_name in alert_list:
         if rule_name == "Inpharmatica":
@@ -146,7 +145,8 @@ class RDFilters:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return [smiles, name, 'INVALID', -999, -999, -999, -999, -999]
-        desc_list = [MolWt(mol), MolLogP(mol), NumHDonors(mol), NumHAcceptors(mol), TPSA(mol), CalcNumRotatableBonds(mol)]
+        desc_list = [MolWt(mol), MolLogP(mol), NumHDonors(mol), NumHAcceptors(mol), TPSA(mol),
+                     CalcNumRotatableBonds(mol)]
         for row in self.rule_list:
             patt, max_val, desc = row
             if len(mol.GetSubstructMatches(patt)) > max_val:
@@ -156,7 +156,8 @@ class RDFilters:
 
 def main():
     cmd_input = docopt(cmd_str)
-    alert_file_name = cmd_input.get("--alerts") or pkg_resources.resource_filename('rd_filters', "data/alert_collection.csv")
+    alert_file_name = cmd_input.get("--alerts") or pkg_resources.resource_filename('rd_filters',
+                                                                                   "data/alert_collection.csv")
     rf = RDFilters(alert_file_name)
 
     if cmd_input.get("template"):
@@ -183,7 +184,7 @@ def main():
         print(f"Using alerts from {rule_str}", file=sys.stderr)
         rf.build_rule_list(rule_list)
         res = list(p.map(rf.evaluate, input_data))
-        df = pd.DataFrame(res, columns=["SMILES", "NAME", "FILTER", "MW", "LogP", "HBD", "HBA", "TPSA","Rot"])
+        df = pd.DataFrame(res, columns=["SMILES", "NAME", "FILTER", "MW", "LogP", "HBD", "HBA", "TPSA", "Rot"])
         df_ok = df[
             (df.FILTER == "OK") &
             df.MW.between(*rule_dict["MW"]) &
@@ -197,7 +198,7 @@ def main():
         output_csv_file = prefix_name + ".csv"
         df_ok[["SMILES", "NAME"]].to_csv(f"{output_smiles_file}", sep=" ", index=False, header=False)
         print(f"Wrote SMILES for molecules passing filters to {output_smiles_file}", file=sys.stderr)
-        df.to_csv(f"{prefix_name}.csv")
+        df.to_csv(f"{prefix_name}.csv", index=False)
         print(f"Wrote detailed data to {output_csv_file}", file=sys.stderr)
 
         num_input_rows = df.shape[0]
