@@ -177,10 +177,6 @@ def main():
         input_data = [x.split() for x in open(input_file_name)]
         input_data = [x for x in input_data if len(x) == 2]
         rule_dict = read_rules(rules_file_path)
-        print(rules_file_path)
-        buff = open(rules_file_path).read()
-        print(buff)
-        print(rule_dict.keys())
 
         rule_list = [x.replace("Rule_", "") for x in rule_dict.keys() if x.startswith("Rule") and rule_dict[x]]
         rule_str = " and ".join(rule_list)
