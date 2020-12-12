@@ -144,7 +144,7 @@ class RDFilters:
         smiles, name = lst_in
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
-            return [smiles, name, 'INVALID', -999, -999, -999, -999, -999]
+            return [smiles, name, 'INVALID', -999, -999, -999, -999, -999, -999]
         desc_list = [MolWt(mol), MolLogP(mol), NumHDonors(mol), NumHAcceptors(mol), TPSA(mol),
                      CalcNumRotatableBonds(mol)]
         for row in self.rule_list:
