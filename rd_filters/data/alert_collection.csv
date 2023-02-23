@@ -1106,20 +1106,20 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 1105,7,Filter2_acyl_phosphyl_sulfonyl_halide,"[C,S,P](=O)[F,Cl,Br,I]",Inpharmatica,1,0
 1106,7,Filter3_allyl_halide,"[F,Cl,Br,I][CX4]C=C",Inpharmatica,1,0
 1107,7,Filter4_alpha_halo_carbonyl,"[Br,Cl,I][C!H0]C=[O,S]",Inpharmatica,1,0
-1108,7,Filter5_azo,"[!#7,#1]~[NX2R0]=[NX2R0]~[!#7,#1]",Inpharmatica,1,0
+1108,7,Filter5_azo,"[$([NX2R0]-[!#7]),$([NX2R0H1])]=[$([NX2R0]-[!#7]),$([NX2R0H1])]",Inpharmatica,1,0
 1109,7,Filter6_benzyl_halide,"[Br,Cl,I][CX4]c",Inpharmatica,1,0
 1110,7,Filter7_diazo,[!#7]~[NX2]~[NX1],Inpharmatica,1,0
 1111,7,Filter8_thio_isocyanat_diimin,"N=C=[N,O,P,S]",Inpharmatica,1,0
-1112,7,Filter9_metal,"[!#1!#6!#7!#8!#9!#15!#16!#17]~[*,#1]",Inpharmatica,1,0
+1112,7,Filter9_metal,"[$([!#1!#6!#7!#8!#9!#15!#16!#17!#35!#53]~[*]),$([!#1!#6!#7!#8!#9!#15!#16!#17!#35!#53;h])]",Inpharmatica,1,0
 1113,7,Filter10_Terminal_vinyl,"[CH2]=[CH][N,O,P,S;R0]",Inpharmatica,1,0
 1114,7,Filter11_nitrosamin,[NR0]~[NX2]~[OX1],Inpharmatica,1,0
-1115,7,Filter12_nitroso,"[*,#1]~[NX2]~[OX1]",Inpharmatica,1,0
-1116,7,Filter13_PS_double_bond,"S=P~[*,#1]",Inpharmatica,1,0
+1115,7,Filter12_nitroso,"[$([NX2]~*),$([NX2H])]~[OX1]",Inpharmatica,1,0
+1116,7,Filter13_PS_double_bond,"S=[$([PX2]~*),$([PX2H])]",Inpharmatica,1,0
 1117,7,Filter14_thio_oxopyrylium_salt,"c1ccc[s,o;X2]c1",Inpharmatica,1,0
 1118,7,Filter15_thiosulfate,[SX4](~S)(~O)(~O)~*,Inpharmatica,1,0
 1119,7,Filter16_trialkyl_phosphin,[PX3]([#6])([#6])[#6],Inpharmatica,1,0
 1120,7,Filter17_trialkyl_phosphin2,[PX4](~[!O!S])([#6])([#6])[#6],Inpharmatica,1,0
-1121,7,Filter18_oxime_ester,"[!#7,#1]C=NO[C,S,P](=O)*",Inpharmatica,1,0
+1121,7,Filter18_oxime_ester,"[$([CX3H1]-[!#7]),$([CX3H2])]=NO[C,S,P](=O)*",Inpharmatica,1,0
 1122,7,Filter19_hydroxyimide_ester,O=C[NX3](C=O)OC(=O)*,Inpharmatica,1,0
 1123,7,Filter20_hydrazine,[Nv3X3][Nv3X3!H0],Inpharmatica,1,0
 1124,7,Filter21_cyanhydrin,[NX1]#C[CX4][OH],Inpharmatica,1,0
@@ -1130,10 +1130,10 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 1129,7,Filter26_alkyl_halide,"AA[CH2][F,Cl,Br,I,$(OS(=O)(=O)*)]",Inpharmatica,1,0
 1130,7,Filter27_anhydride,"*[C,S](=O)O[C,S](=O)*",Inpharmatica,1,0
 1131,7,Filter28_halo_pyrimidine,"c1nc(ncc1)[Br,I]",Inpharmatica,1,0
-1132,7,Filter29_thioester,"CC(=[OX1,SX1,NH])[SX2][*,#1]",Inpharmatica,1,0
-1133,7,Filter30_beta_halo_carbonyl,"[#6,#1]C(=O)CC[Br,I]",Inpharmatica,1,0
-1134,7,Filter31_so_bond,"[*,#1][SX2R0]O[*,#1]",Inpharmatica,1,0
-1135,7,Filter32_oo_bond,"[*,#1][OR0]O[*,#1]",Inpharmatica,1,0
+1132,7,Filter29_thioester,"CC(=[OX1,SX1,NH])[$([SX2]-*),$([SX2H])]",Inpharmatica,1,0
+1133,7,Filter30_beta_halo_carbonyl,"[$(C(-C)(-C)(=O)),$([CH](=O)-C)](=O)CC[Br,I]",Inpharmatica,1,0
+1134,7,Filter31_so_bond,"[SX2R0][OX2]",Inpharmatica,1,0
+1135,7,Filter32_oo_bond,"[OX2R0][OX2]",Inpharmatica,1,0
 1136,7,Filter33_c10_alkyl,[CH3][CH2][CH2][CH2][CH2][CH2][CH2][CH2][CH2][CH2],Inpharmatica,1,0
 1137,7,Filter34_isotope,"[2#1,3#1,13C,14C,15N,125I,23F,22Na,32P,33P,35S,45Ca,57Co,103Ru,141Ce]",Inpharmatica,1,0
 1138,7,Filter35_pp_bond,P-P,Inpharmatica,1,0
@@ -1145,12 +1145,12 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 1144,7,Filter41_12_dicarbonyl,*C(=O)C(=O)*,Inpharmatica,1,0
 1145,7,Filter42_12_dicarbonyl_tautomer,[*!$(C[OH])]=C([OH])C(=O)*,Inpharmatica,1,0
 1146,7,Filter43_michael_acceptor_sp1,C#CC=O,Inpharmatica,1,0
-1147,7,Filter44_michael_acceptor2,"[#6,#1,OH0][C!$(C1(=O)C=CC(=O)C=C1)](=O)C=[C!$(C[Nv3X3,OH])]",Inpharmatica,1,0
+1147,7,Filter44_michael_acceptor2,"[$([C!$(C1(=O)C=CC(=O)C=C1)]C),$([Ch]),$(C[OH0])](=O)C=[C!$(C[Nv3X3,OH])]",Inpharmatica,1,0
 1148,7,Filter45_allyl_halide2,"[Br,Cl,I][CX4]C=[C,N,P]",Inpharmatica,1,0
 1149,7,Filter46_nhalide,"N[F,Cl,Br,I]",Inpharmatica,1,0
 1150,7,Filter47_so2f,O=S(=O)(*)F,Inpharmatica,1,0
 1151,7,Filter48_foso,O=S(*)OF,Inpharmatica,1,0
-1152,7,Filter49_halogen,"[*,#1]~[F,Cl,Br,I]~[*,#1]",Inpharmatica,1,0
+1152,7,Filter49_halogen,"[FX2,ClX2,BrX2,IX2,IX3,IX4,IX5]",Inpharmatica,1,0
 1153,7,Filter50_grignard,"C[Mg][F,Cl,Br,I]",Inpharmatica,1,0
 1154,7,Filter51_pn3,N[PX3](N)N,Inpharmatica,1,0
 1155,7,Filter52_NC_haloamine,"NC[F,Cl,Br,I]",Inpharmatica,1,0
@@ -1188,7 +1188,7 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 1187,7,Filter86_cyanamide,N#C[#7!$(N(C#N)=C(N)NC)],Inpharmatica,1,0
 1188,7,Filter87_crowns,"[N,O,S]-@[#6!$(*(~@*)(~@*)~@*)]@[#6!$(*(~@*)(~@*)~@*)]-@[N,O,S]-@[#6!$(*(~@*)(~@*)~@*)]@[#6!$(*(~@*)(~@*)~@*)]-@[O,N]-@[#6!$(*(~@*)(~@*)~@*)]@[#6!$(*(~@*)(~@*)~@*)]-@[N,O,S]-@C",Inpharmatica,1,0
 1189,7,Filter88_ene_sulfone,[C!H0]=CS(=O)(=O)*,Inpharmatica,1,0
-1190,7,Filter89_hydroxylamine,"[*!$(C=O)]!@N!@O[*,#1]",Inpharmatica,1,0
+1190,7,Filter89_hydroxylamine,"[*!$(C=O)]!@N!@[$([OX2])]",Inpharmatica,1,0
 1191,7,Filter90_N_double_bond_S,N=!@S,Inpharmatica,1,0
 1192,7,Filter92_trityl,*(c1ccccc1)(c1ccccc1)(c1ccccc1),Inpharmatica,1,0
 1193,7,Filter93_acetyl_urea,C(=O)!@N!@C(=O)[#7],Inpharmatica,1,0
@@ -1201,7 +1201,7 @@ rule_id,rule_set,description,smarts,rule_set_name,priority,max
 1200,8,"Si,B,Se atoms","[Si,B,Se]",LINT,2,0
 1201,8,hetero imides,[!#6]-[CH2]-N1C(=O)CCC(=O)1,LINT,2,0
 1202,8,poly ethers,O[CH2][CH2]O-!@[CH2][CH2]O,LINT,2,0
-1203,8,acyclic imines,"C-!@[NX2]=[C!R,#1]-C",LINT,2,0
+1203,8,acyclic imines,"[$([CX3R0]([#6])[#6]),$([CX3HR0][#6])]=[$([NX2R0][#6]),$([NX2HR0])]",LINT,2,0
 1204,8,alkyl esters of S or P,"[S,P](=O)OC",LINT,2,0
 1205,8,ugly P compounds,"P(=[O,S])[C,N]([C,N])[C,N]",LINT,2,0
 1206,8,"acyclic N-,=N and not N bound to carbonyl or sulfone","[N;!$(N-[C,S]=*)]-,=;!@[N;!$(N-[C,S]=*)]",LINT,2,0
