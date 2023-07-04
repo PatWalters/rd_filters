@@ -1,14 +1,15 @@
 import pkg_resources
+import pytest
 
 from rd_filters import rd_filters
 
 # these just stop on the first filter
-test_lint = [
+_lint_data = [
     ("C1N=C1", "aziridine-like N in 3-membered ring > 0"),
     ("NN=N", "acyclic N-,=N and not N bound to carbonyl or sulfone > 0"),
 ]
 
-test_inpharmatica = [
+_inpharmatica_data = [
     ("CN=C", "OK"),
     ("CN=CC", "Filter39_imine > 0"),
     ("CN=C(C)", "Filter39_imine > 0"),
@@ -53,11 +54,21 @@ test_inpharmatica = [
 ]
 
 
-def test_hydrogen_suppression():
-    alert_file_name = pkg_resources.resource_filename("rd_filters", "data/alerts.csv")
-    for rule_list, tests in [(["Inpharmatica"], test_inpharmatica), (["LINT"], test_lint)]:
-        rf = rd_filters.RDFilters(alert_file_name)
-        rf.build_rule_list(rule_list)
-        for smi, res in tests:
-            result = rf.evaluate((smi, smi))
-            assert result[2] == res, repr((result[:3], res))
+def test_lint():
+    alerts = rd_filters._read_alerts_file(rd_filters._alerts_file)
+    rf = rd_filters.RDFilters(alerts, [])
+    for input_, expected in _lint_data:
+        actual = list(rf.detect(input_))
+        assert actual == [expected]
+
+
+def test_inpharmatica():
+    alerts = rd_filters._read_alerts_file(rd_filters._alerts_file)
+    rf = rd_filters.RDFilters(alerts, [])
+    input_data = [rd_filters.Input(x, x) for x, y in _inpharmatica_data]
+    results = list(rf.detect_all(input_data))
+    assert [r.violation for r in results] == [x for x, _ in _inpharmatica_data]
+
+
+if __name__ == "__main__":
+    pytest.main()

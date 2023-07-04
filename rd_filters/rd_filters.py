@@ -140,12 +140,25 @@ app = typer.Typer()
 
 @app.command()
 def report(
-    data: Path = typer.Argument(dir_okay=False),
-    alerts: Path = typer.Option(_alerts_file, dir_okay=False),
-    rules: Path = typer.Option(_rules_file, dir_okay=False),
+    data: Path = typer.Argument(
+        dir_okay=False,
+        help="""
+        Can be .smi/.smiles/.txt containing SMILES,
+        a JSON file like [{"smiles": "O", "id": "oxygen"}],
+        'or a CSV file with columns "smiles" and "id".
+        """,
+    ),
+    alerts: Path = typer.Option(_alerts_file, dir_okay=False, help="Path to alerts.csv file"),
+    rules: Path = typer.Option(_rules_file, dir_okay=False, help="Path to rules.json file"),
+    exclude: str = typer.Option(
+        "", help="Comma-separated list of alert groups and rule properties to exclude"
+    ),
     num_cores: int = typer.Option(1, min=1, max=mp.cpu_count()),
 ):
-    rf = RDFilters(_read_alerts_file(alerts), _read_rules_file(rules))
+    exclude = {s.strip() for s in exclude.split(",")}
+    alerts = [a for a in _read_alerts_file(alerts) if a.name not in exclude]
+    rules = [r for r in _read_rules_file(rules) if r.property in exclude]
+    rf = RDFilters(alerts, rules)
 
     def fn(task):
         for v in rf.detect_all([task]):
@@ -157,12 +170,25 @@ def report(
 
 @app.command(name="filter")
 def filter_ok(
-    data: Path = typer.Argument(dir_okay=False),
-    alerts: Path = typer.Option(_alerts_file, dir_okay=False),
-    rules: Path = typer.Option(_rules_file, dir_okay=False),
+    data: Path = typer.Argument(
+        dir_okay=False,
+        help="""
+        Can be .smi/.smiles/.txt containing SMILES,
+        a JSON file like [{"smiles": "O", "id": "oxygen"}],
+        'or a CSV file with columns "smiles" and "id".
+        """,
+    ),
+    alerts: Path = typer.Option(_alerts_file, dir_okay=False, help="Path to alerts.csv file"),
+    rules: Path = typer.Option(_rules_file, dir_okay=False, help="Path to rules.json file"),
+    exclude: str = typer.Option(
+        "", help="Comma-separated list of alert groups and rule properties to exclude"
+    ),
     num_cores: int = typer.Option(1, min=1, max=mp.cpu_count()),
 ):
-    rf = RDFilters(_read_alerts_file(alerts), _read_rules_file(rules))
+    exclude = {s.strip() for s in exclude.split(",")}
+    alerts = [a for a in _read_alerts_file(alerts) if a.name not in exclude]
+    rules = [r for r in _read_rules_file(rules) if r.property in exclude]
+    rf = RDFilters(alerts, rules)
 
     def fn(task):
         for v in rf.detect_all([task]):
