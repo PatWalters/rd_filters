@@ -1,0 +1,78 @@
+[metadata]
+description-file = "README.md"
+
+[build-system]
+requires = ["poetry>=1.5,<2", "virtualenv>=20.0.33", "wheel>=0.37,<1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "rd_filters"
+version = "0.2.0"
+description = "Apply structural alerts to chemical structures."
+maintainers = ["Pat Walters"]
+authors = ["Pat Walters"]
+license = "MIT"
+readme = "README.md"
+keywords = ["chemistry", "alerts", "chembl", "rdkit"]
+homepage = "https://github.com/PatWalters/rd_filters"
+repository = "https://github.com/PatWalters/rd_filters"
+documentation = "https://github.com/PatWalters/rd_filters"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Chemistry"
+]
+
+[tool.poetry.urls]
+CI = "https://github.com/PatWalters/rd_filters/actions"
+Issues = "https://github.com/PatWalters/rd_filters/issues"
+Changelog = "https://github.com/PatWalters/rd_filters/blob/main/CHANGELOG.md"
+
+[tool.poetry.scripts]
+rd_filters = "rd_filters.rd_filters:cli"
+
+[tool.poetry.dependencies]
+python                        = "^3.11"
+tomlkit                       = ">=0.11, <1"
+typer                         = "^0.9"
+rdkit                         = ">=2022"
+
+[tool.poetry.group.test.dependencies]
+coverage                      = {version = "^7", extras = ["toml"]}
+pre-commit                    = "^3.3"
+pytest                        = "^7"
+pytest-cov                    = "^4"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+addopts = "--cov rd_filters --cov-report term-missing"
+
+[tool.coverage.run]
+source = "rd_filters"
+
+[tool.coverage.html]
+directory = ".coverage_report"
+
+[tool.coverage.paths]
+source = ["rd_filters"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100

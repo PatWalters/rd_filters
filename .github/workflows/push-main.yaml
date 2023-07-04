@@ -1,0 +1,29 @@
+# Build, test, and run static analyses, and send reports to external services
+# Runs only on pushing to main
+name: maintest
+on:
+  push:
+    branches: [main, master]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    name: "test on ${{ matrix.os }}/py${{ matrix.python-version }}"
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: Install Tox
+        run: pip install "tox>=4,<5"
+      - name: Test with tox
+        run: |
+          tox -v
+      #- name: Submit to codecov
+      #  if: runner.os == 'Linux' && $USE_CODECOV
+      #  run: pip install "codecov>=$CODECOV_VR" && codecov
