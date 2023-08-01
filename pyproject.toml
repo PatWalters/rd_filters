@@ -37,7 +37,7 @@ Issues = "https://github.com/PatWalters/rd_filters/issues"
 Changelog = "https://github.com/PatWalters/rd_filters/blob/main/CHANGELOG.md"
 
 [tool.poetry.scripts]
-rd_filters = "rd_filters.rd_filters:cli"
+rd-filters = "rd_filters.rd_filters:cli"
 
 [tool.poetry.dependencies]
 python                        = "^3.11"
