@@ -2,7 +2,7 @@ from typing import Self
 
 import pytest
 
-from rd_filters import rd_filters
+from rd_filters.rd_filters import Input, Io, RDFilters
 
 # these just stop on the first filter
 _lint_data = {
@@ -60,12 +60,19 @@ _lint_data = {
 
 class Test:
     def test_detect(self: Self) -> None:
-        alerts = rd_filters.read_alerts_file(rd_filters.DEFAULT_ALERTS_FILE)
-        rf = rd_filters.RDFilters(alerts, [])
+        alerts = Io.read_alerts_file(Io.DEFAULT_ALERTS_FILE)
+        rf = RDFilters(alerts, [])
         for smiles, expected in _lint_data.items():
-            actual = set(rf.detect(smiles))
+            inp = Input(id=smiles, smiles=smiles)
+            actual = set({dct.name for dct in rf.detect(inp)})
             assert actual == expected, f"Invalid result for '{smiles}'"
             # assert {r.msg for r in actual} == [f"{y}: {x}" for x, y in _inpharmatica_data]
+
+    def test_filter(self: Self) -> None:
+        pass  # TODO
+
+    def test_(self: Self) -> None:
+        pass  # TODO
 
 
 if __name__ == "__main__":
