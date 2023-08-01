@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install build meta-dependencies
-        run: pip install $META_DEPS
+        run: pip install .
       - name: Build sdists and wheels with Poetry
         run: |
           poetry build

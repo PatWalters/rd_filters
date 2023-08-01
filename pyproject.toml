@@ -1,8 +1,5 @@
-[metadata]
-description-file = "README.md"
-
 [build-system]
-requires = ["poetry>=1.5,<2", "virtualenv>=20.0.33", "wheel>=0.37,<1.0"]
+requires = ["poetry-core>=1.6,<2", "virtualenv>=20.0.33", "wheel>=0.37,<1.0"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry]
@@ -15,8 +12,9 @@ license = "MIT"
 readme = "README.md"
 keywords = ["chemistry", "alerts", "chembl", "rdkit"]
 homepage = "https://github.com/PatWalters/rd_filters"
-repository = "https://github.com/PatWalters/rd_filters"
-documentation = "https://github.com/PatWalters/rd_filters"
+Source = "https://github.com/PatWalters/rd_filters"
+Documentation = "https://github.com/PatWalters/rd_filters"
+Tracker = "https://github.com/PatWalters/rd_filters/issues"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Natural Language :: English",
