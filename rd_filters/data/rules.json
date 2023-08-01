@@ -1,8 +1,8 @@
 [
-  { "property": "HBA", "min": 0, "max": 10 },
-  { "property": "HBD", "min": 0, "max": 5 },
-  { "property": "LogP", "min": -5, "max": 5 },
-  { "property": "MW", "min": 0, "max": 500 },
-  { "property": "Rot", "min": 0, "max": 10 },
-  { "property": "TSPA", "min": 0, "max": 200 }
+  { "property": "NumHAcceptors", "min": 0, "max": 10 },
+  { "property": "NumHDonors", "min": 0, "max": 5 },
+  { "property": "MolLogP", "min": -5, "max": 5 },
+  { "property": "MolWt", "min": 0, "max": 500 },
+  { "property": "NumRotatableBonds", "min": 0, "max": 10 },
+  { "property": "TPSA", "min": 0, "max": 200 }
 ]

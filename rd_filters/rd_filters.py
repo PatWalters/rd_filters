@@ -3,29 +3,28 @@ import functools
 import json
 import logging
 import multiprocessing as mp
-from collections.abc import Generator, Iterable
+from collections.abc import Callable, Generator, Iterable
 from dataclasses import dataclass, field
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Optional
+from typing import Any, Self
+
+try:
+    from typing import Annotated
+except ImportError:
+    from typing import Annotated
 
 import pkg_resources
 import typer
 from rdkit import Chem
-from rdkit.Chem.Descriptors import TPSA, MolLogP, MolWt, NumHAcceptors, NumHDonors
-from rdkit.Chem.rdMolDescriptors import CalcNumRotatableBonds
+from rdkit.Chem import Descriptors
+
+DEFAULT_ALERTS_FILE = Path(pkg_resources.resource_filename("rd_filters", "data/alerts.csv"))
+DEFAULT_RULES_FILE = Path(pkg_resources.resource_filename("rd_filters", "data/rules.json"))
 
 logger = logging.getLogger(__package__)
-_alerts_file = pkg_resources.resource_filename("rd_filters", "data/alerts.csv")
-_rules_file = pkg_resources.resource_filename("rd_filters", "data/rules.json")
-_rule_fns = {
-    "MW": MolWt,
-    "LogP": MolLogP,
-    "HBD": NumHDonors,
-    "HBA": NumHAcceptors,
-    "TPSA": TPSA,
-    "Rot": CalcNumRotatableBonds,
-}
+# noinspection PyUnresolvedReferences
+_rule_fns = dict(Descriptors.descList)
 
 
 def _read_file(path: Path) -> list[dict]:
@@ -38,7 +37,7 @@ def _read_file(path: Path) -> list[dict]:
             return json.load(f)
 
 
-@dataclass(frozen=True, repr=True, order=True)
+@dataclass(frozen=True, slots=False, order=True)
 class Alert:
     id: int
     group: str
@@ -47,7 +46,7 @@ class Alert:
     priority: int
 
     @functools.cached_property
-    def chem(self) -> str:
+    def mol(self) -> str:
         return Chem.MolFromSmarts(self.smarts)
 
     @property
@@ -55,28 +54,27 @@ class Alert:
         return f"{self.name}:{self.description.replace(' ', '-')}"
 
 
-@dataclass(frozen=True, repr=True, order=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Rule:
     id: str | None
-    property: int
+    property: str
     min: float
     max: float
 
     @property
-    def name(self):
+    def name(self) -> str:
         if self.id is None:
             return self.property
-        else:
-            return self.id
+        return self.id
 
 
-@dataclass(frozen=True, repr=True, order=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Input:
     smiles: str
     id: str
 
 
-@dataclass(frozen=True, repr=True, order=True)
+@dataclass(frozen=True, slots=True, order=True)
 class Violation:
     smiles: str
     id: str
@@ -87,42 +85,58 @@ class Violation:
         return f"{self.id}: {self.violation}"
 
 
-def _read_input_file(path: Path) -> list[Input]:
+def read_input_file(path: Path) -> list[Input]:
     if path.suffix in {".txt", ".smi", ".smiles"}:
         lines = path.read_text(encoding="utf8").splitlines()
         return [Input(s, s) for s in lines]
     return [Input(**x) for x in _read_file(path)]
 
 
-def _read_alerts_file(path: Path) -> list[Alert]:
+def read_alerts_file(path: Path) -> list[Alert]:
     return [Alert(**x) for x in _read_file(path)]
 
 
-def _read_rules_file(path: Path) -> list[Rule]:
+def read_rules_file(path: Path) -> list[Rule]:
     return [Rule(**x) for x in _read_file(path)]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class RDFilters:
     alerts: list[Alert]
     rules: list[Rule]
+
+    @classmethod
+    def from_files(cls, *, alerts: Path, rules: Path, exclude: set[str] | None = None) -> Self:
+        if exclude is None:
+            exclude = set()
+        return cls(
+            alerts=[a for a in read_alerts_file(alerts) if a.name not in exclude],
+            rules=[r for r in read_rules_file(rules) if r.property in exclude],
+        )
 
     def __post_init__(self):
         for rule in self.rules:
             if rule.property not in _rule_fns:
                 raise KeyError(f"Property '{rule.property}' of rule '{rule.name} is unknown")
 
-    def detect_all(self, inputs: Iterable[Input]) -> Generator[Violation, None, None]:
+    def filter(self, inputs: Iterable[Input]) -> Generator[Input]:
+        for inp in inputs:
+            try:
+                next(iter(self.detect(inp.smiles)))
+            except StopIteration:
+                yield inp
+
+    def detect_all(self, inputs: Iterable[Input]) -> Generator[Violation]:
         for inp in inputs:
             for msg in self.detect(inp.smiles):
                 yield Violation(inp.smiles, inp.id, msg)
             else:
                 yield Violation(inp.smiles, inp.id, "OK")
 
-    def detect(self, smiles: str) -> Generator[str, None, None]:
+    def detect(self, smiles: str) -> Generator[str]:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
-            yield "invalid"
+            yield "INVALID"
             return
         for rule in self.rules:
             value = _rule_fns[rule.property](mol)
@@ -131,72 +145,112 @@ class RDFilters:
             if value > rule.min:
                 yield f"{rule.name}: {value}>{rule.max}"
         for alert in self.alerts:
-            for match in mol.GetSubstructMatches(alert.smarts):
-                yield f"{alert.description}: '{match}'"
+            for _ in mol.GetSubstructMatches(alert.mol):
+                yield f"{alert.description}"
 
 
 app = typer.Typer()
 
 
+class Filter:
+    num_cores: int
+    out: Callable[[Violation], Any]
+    rf: RDFilters
+
+    def __call__(self, data: Path):
+        def fn(task):
+            for v in self.rf.detect_all([task]):
+                self.out(v)
+
+        inputs = read_input_file(data)
+        Pool(self.num_cores).map(fn, inputs)
+
+
 @app.command()
 def report(
-    data: Path = typer.Argument(
-        dir_okay=False,
-        help="""
-        Can be .smi/.smiles/.txt containing SMILES,
-        a JSON file like [{"smiles": "O", "id": "oxygen"}],
-        'or a CSV file with columns "smiles" and "id".
-        """,
-    ),
-    alerts: Path = typer.Option(_alerts_file, dir_okay=False, help="Path to alerts.csv file"),
-    rules: Path = typer.Option(_rules_file, dir_okay=False, help="Path to rules.json file"),
-    exclude: str = typer.Option(
-        "", help="Comma-separated list of alert groups and rule properties to exclude"
-    ),
-    num_cores: int = typer.Option(1, min=1, max=mp.cpu_count()),
+    data: Annotated[
+        Path,
+        typer.Argument(
+            dir_okay=False,
+            help="""
+            Can be .smi/.smiles/.txt containing SMILES,
+            a JSON file like [{"smiles": "O", "id": "oxygen"}],
+            'or a CSV file with columns "smiles" and "id".
+            """,
+        ),
+    ],
+    alerts: Annotated[
+        Path,
+        typer.Option(
+            DEFAULT_ALERTS_FILE, dir_okay=False, readable=True, help="Path to alerts.csv file"
+        ),
+    ],
+    rules: Annotated[
+        Path,
+        typer.Option(
+            DEFAULT_RULES_FILE, dir_okay=False, readable=True, help="Path to rules.json file"
+        ),
+    ],
+    exclude: Annotated[
+        str,
+        typer.Option(
+            "", help="Comma-separated list of alert groups and rule properties to exclude"
+        ),
+    ],
+    num_cores: Annotated[int, typer.Option(1, min=1, max=mp.cpu_count(), allow_dash=True)],
 ):
     exclude = {s.strip() for s in exclude.split(",")}
-    alerts = [a for a in _read_alerts_file(alerts) if a.name not in exclude]
-    rules = [r for r in _read_rules_file(rules) if r.property in exclude]
-    rf = RDFilters(alerts, rules)
+    rf = RDFilters.from_files(alerts=alerts, rules=rules, exclude=exclude)
 
     def fn(task):
         for v in rf.detect_all([task]):
             print(v.msg)
 
-    inputs = _read_input_file(data)
+    inputs = read_input_file(data)
     Pool(num_cores).map(fn, inputs)
 
 
 @app.command(name="filter")
 def filter_ok(
-    data: Path = typer.Argument(
-        dir_okay=False,
-        help="""
-        Can be .smi/.smiles/.txt containing SMILES,
-        a JSON file like [{"smiles": "O", "id": "oxygen"}],
-        'or a CSV file with columns "smiles" and "id".
-        """,
-    ),
-    alerts: Path = typer.Option(_alerts_file, dir_okay=False, help="Path to alerts.csv file"),
-    rules: Path = typer.Option(_rules_file, dir_okay=False, help="Path to rules.json file"),
-    exclude: str = typer.Option(
-        "", help="Comma-separated list of alert groups and rule properties to exclude"
-    ),
-    num_cores: int = typer.Option(1, min=1, max=mp.cpu_count()),
+    data: Annotated[
+        Path,
+        typer.Argument(
+            dir_okay=False,
+            help="""
+            Can be .smi/.smiles/.txt containing SMILES,
+            a JSON file like [{"smiles": "O", "id": "oxygen"}],
+            'or a CSV file with columns "smiles" and "id".
+            """,
+        ),
+    ],
+    alerts: Annotated[
+        Path,
+        typer.Option(
+            DEFAULT_ALERTS_FILE, dir_okay=False, readable=True, help="Path to alerts.csv file"
+        ),
+    ],
+    rules: Annotated[
+        Path,
+        typer.Option(
+            DEFAULT_RULES_FILE, dir_okay=False, readable=True, help="Path to rules.json file"
+        ),
+    ],
+    exclude: Annotated[
+        str,
+        typer.Option(
+            "", help="Comma-separated list of alert groups and rule properties to exclude"
+        ),
+    ],
+    num_cores: Annotated[int, typer.Option(1, min=1, max=mp.cpu_count(), allow_dash=True)],
 ):
     exclude = {s.strip() for s in exclude.split(",")}
-    alerts = [a for a in _read_alerts_file(alerts) if a.name not in exclude]
-    rules = [r for r in _read_rules_file(rules) if r.property in exclude]
-    rf = RDFilters(alerts, rules)
+    rf = RDFilters.from_files(alerts=alerts, rules=rules, exclude=exclude)
 
     def fn(task):
-        for v in rf.detect_all([task]):
-            if v.violation == "OK":
-                print(v.id)
-                break
+        for v in rf.filter([task]):
+            print(v.id)
 
-    inputs = _read_input_file(data)
+    inputs = read_input_file(data)
     Pool(num_cores).map(fn, inputs)
 
 
