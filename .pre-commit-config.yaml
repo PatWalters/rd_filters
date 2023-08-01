@@ -1,5 +1,5 @@
 # Check out https://pre-commit.com/ for documentation
-# :Tyranno: minimum_pre_commit_version: ${.test-deps.pre-commit}
+# :tyranno: minimum_pre_commit_version: $project.optional-dependencies.test.pre-commit}
 minimum_pre_commit_version: 3.3.3
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
