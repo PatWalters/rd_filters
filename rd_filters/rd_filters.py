@@ -9,15 +9,15 @@ from multiprocessing import Pool
 from pathlib import Path
 from typing import Any, Self
 
-try:
-    from typing import Annotated
-except ImportError:
-    from typing import Annotated
-
 import pkg_resources
 import typer
 from rdkit import Chem
 from rdkit.Chem import Descriptors
+
+try:
+    from typing import Annotated
+except ImportError:
+    from typing import Annotated
 
 DEFAULT_ALERTS_FILE = Path(pkg_resources.resource_filename("rd_filters", "data/alerts.csv"))
 DEFAULT_RULES_FILE = Path(pkg_resources.resource_filename("rd_filters", "data/rules.json"))
@@ -46,11 +46,11 @@ class Alert:
     priority: int
 
     @functools.cached_property
-    def mol(self) -> str:
+    def mol(self: Self) -> str:
         return Chem.MolFromSmarts(self.smarts)
 
     @property
-    def name(self) -> str:
+    def name(self: Self) -> str:
         return f"{self.name}:{self.description.replace(' ', '-')}"
 
 
@@ -62,7 +62,7 @@ class Rule:
     max: float
 
     @property
-    def name(self) -> str:
+    def name(self: Self) -> str:
         if self.id is None:
             return self.property
         return self.id
@@ -81,7 +81,7 @@ class Violation:
     violation: str
 
     @property
-    def msg(self) -> str:
+    def msg(self: Self) -> str:
         return f"{self.id}: {self.violation}"
 
 
@@ -106,7 +106,7 @@ class RDFilters:
     rules: list[Rule]
 
     @classmethod
-    def from_files(cls, *, alerts: Path, rules: Path, exclude: set[str] | None = None) -> Self:
+    def from_files(cls: type[Self], *, alerts: Path, rules: Path, exclude: set[str] | None = None) -> Self:
         if exclude is None:
             exclude = set()
         return cls(
@@ -114,26 +114,29 @@ class RDFilters:
             rules=[r for r in read_rules_file(rules) if r.property in exclude],
         )
 
-    def __post_init__(self):
+    def __post_init__(self: Self) -> None:
         for rule in self.rules:
             if rule.property not in _rule_fns:
-                raise KeyError(f"Property '{rule.property}' of rule '{rule.name} is unknown")
+                _msg = f"Property '{rule.property}' of rule '{rule.name} is unknown"
+                raise KeyError(_msg)
 
-    def filter(self, inputs: Iterable[Input]) -> Generator[Input]:
+    def filter(self: Self, inputs: Iterable[Input]) -> Generator[Input]:
         for inp in inputs:
             try:
                 next(iter(self.detect(inp.smiles)))
-            except StopIteration:
+            except StopIteration:  # noqa: PERF203
                 yield inp
 
-    def detect_all(self, inputs: Iterable[Input]) -> Generator[Violation]:
+    def detect_all(self: Self, inputs: Iterable[Input]) -> Generator[Violation]:
         for inp in inputs:
+            ok = False
             for msg in self.detect(inp.smiles):
                 yield Violation(inp.smiles, inp.id, msg)
-            else:
+                ok = False
+            if ok:
                 yield Violation(inp.smiles, inp.id, "OK")
 
-    def detect(self, smiles: str) -> Generator[str]:
+    def detect(self: Self, smiles: str) -> Generator[str]:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             yield "INVALID"
@@ -157,8 +160,8 @@ class Filter:
     out: Callable[[Violation], Any]
     rf: RDFilters
 
-    def __call__(self, data: Path):
-        def fn(task):
+    def __call__(self: Self, data: Path) -> None:
+        def fn(task: Input) -> None:
             for v in self.rf.detect_all([task]):
                 self.out(v)
 
@@ -198,11 +201,11 @@ def report(
         ),
     ],
     num_cores: Annotated[int, typer.Option(1, min=1, max=mp.cpu_count(), allow_dash=True)],
-):
+) -> None:
     exclude = {s.strip() for s in exclude.split(",")}
     rf = RDFilters.from_files(alerts=alerts, rules=rules, exclude=exclude)
 
-    def fn(task):
+    def fn(task: Input) -> None:
         for v in rf.detect_all([task]):
             print(v.msg)
 
@@ -242,11 +245,11 @@ def filter_ok(
         ),
     ],
     num_cores: Annotated[int, typer.Option(1, min=1, max=mp.cpu_count(), allow_dash=True)],
-):
+) -> None:
     exclude = {s.strip() for s in exclude.split(",")}
     rf = RDFilters.from_files(alerts=alerts, rules=rules, exclude=exclude)
 
-    def fn(task):
+    def fn(task: Input) -> None:
         for v in rf.filter([task]):
             print(v.id)
 

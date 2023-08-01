@@ -1,3 +1,5 @@
+from typing import Self
+
 import pytest
 
 from rd_filters import rd_filters
@@ -57,7 +59,7 @@ _lint_data = {
 
 
 class Test:
-    def test_detect(self):
+    def test_detect(self: Self) -> None:
         alerts = rd_filters.read_alerts_file(rd_filters.DEFAULT_ALERTS_FILE)
         rf = rd_filters.RDFilters(alerts, [])
         for smiles, expected in _lint_data.items():
