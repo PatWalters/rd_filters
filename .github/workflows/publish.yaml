@@ -34,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: $MAX_PYTHON_VR
+          python-version: "3.11"
       - name: Install build meta-dependencies
         run: pip install $META_DEPS
       - name: Build sdists and wheels with Poetry

@@ -24,6 +24,3 @@ jobs:
       - name: Test with tox
         run: |
           tox -v
-      #- name: Submit to codecov
-      #  if: runner.os == 'Linux' && $USE_CODECOV
-      #  run: pip install "codecov>=$CODECOV_VR" && codecov
