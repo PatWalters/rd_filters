@@ -1,0 +1,169 @@
+[build-system]
+requires = ["poetry-core>=1.6,<2", "virtualenv>=20.0.33", "wheel>=0.37,<1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "rd_filters"
+version = "0.2.0"
+description = "Apply structural alerts to chemical structures."
+maintainers = ["Pat Walters"]
+authors = ["Pat Walters"]
+license = "MIT"
+readme = "README.md"
+keywords = ["chemistry", "alerts", "chembl", "rdkit"]
+homepage = "https://github.com/PatWalters/rd_filters"
+Source = "https://github.com/PatWalters/rd_filters"
+Documentation = "https://github.com/PatWalters/rd_filters"
+Tracker = "https://github.com/PatWalters/rd_filters/issues"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Chemistry"
+]
+
+[tool.poetry.urls]
+CI = "https://github.com/PatWalters/rd_filters/actions"
+Issues = "https://github.com/PatWalters/rd_filters/issues"
+Changelog = "https://github.com/PatWalters/rd_filters/blob/main/CHANGELOG.md"
+
+[tool.poetry.scripts]
+rd-filters = "rd_filters.rd_filters:cli"
+
+[tool.poetry.dependencies]
+python                        = "^3.11"
+tomlkit                       = ">=0.11, <1"
+typer                         = "^0.9"
+rdkit                         = ">=2022"
+
+[tool.poetry.group.test.dependencies]
+coverage                      = {version = "^7", extras = ["toml"]}
+pre-commit                    = "^3.3"
+pytest                        = "^7"
+pytest-cov                    = "^4"
+ruff                          = ">=0.0.280"
+
+[tool.commitizen]
+# Remove when major version > 0
+major_version_zero = true
+version_scheme = "semver"
+version = "0.2.0"
+bump_message = "chore: bump version $current_version → $new_version"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(name)s: %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+addopts = "--cov rd_filters --cov-report term-missing"
+
+[tool.coverage.run]
+source = "rd_filters"
+
+[tool.coverage.html]
+directory = ".coverage_report"
+
+[tool.coverage.paths]
+source = ["rd_filters"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 120
+include = [
+  "*.py",            # Source
+  "*.pyi",           # Compiled
+  "pyproject.toml",  # This (RUF checks)
+  "*.ipynb"          # Jupyter notebooks
+]
+select = [
+  "A",        # flake8-builtins
+  "ANN",      # flake8-annotations
+  "ASYNC",    # flake8-async
+  "B",        # flake8-bugbear
+  "BLE",      # flake8-blind-exception
+  "C",        # flake8-comprehensions
+  "COM",      # flake8-commas
+  "DTZ",      # flake8-datetimez
+  "EM",       # flake8-errmsg
+  "F",        # pyflakes
+  "FA",       # flake8-future-annotations
+  "E",        # flake8 errors (most fixed by black; rest are nitpicky)
+  "G",        # flake8-logging-concat
+  "I",        # isort
+  "INP",      # flake8-no-pep420
+  "ISC",      # flake8-implicit-str-concat
+  "N",        # flake8-naming
+  "NPY",      # numpy-specific rules
+  "PERF",     # perflint
+  "PGH",      # pygrep-hooks
+  "PIE",      # flake8-pie
+  "PL",       # pylint
+  "PTH",      # flake8-use-pathlib
+  "Q",        # flake8-quotes
+  "RUF",      # Ruff-specific tests
+  "S",        # bandit
+  "SIM",      # flake8-simplify
+  "SLOT",     # flake8-slots
+  "T10",      # debugger
+  "TCH",      # flake8-type-checking
+  "TID",      # flake8-tidy-imports (mostly bans relative imports)
+  "UP",       # pyupgrade
+  "W",        # warnings (most fixed by Black, but W605 is invalid escape char)
+  "YTT",      # flake8-2020 (unlikely problematic checks for Python version)
+  "RUF"       # Ruff-specific rules
+]
+exclude = [
+  "ARG",      # flake8-unused (unused parameters are almost always intentional, like when overriding)
+  "FBT",      # flake8-boolean-trap (debatable, and might not have a choice)
+  "ICN",      # flake8-import-conventionals (isort does this)
+]
+ignore = [
+  "A003",     # class attributes shadowing
+  "COM812",   # don't require trailing comma -- let black handle
+  "B027",     # Allow non-abstract empty methods in abstract base classes
+  "FBT003",   # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "C901",     # Ignore complexity:
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+  "D107",     # Missing docstring in __init__ (put in class docstring)
+  "D212",     # Multi-line docstring start (contradictory)
+  "E225",     # Missing whitespace around operator (sometimes useful to condense)
+  "E501",     # Line > 79 chars (we use black)
+]
+unfixable = [
+  "F401",     # Don't touch unused imports
+  "RUF100",   # Unused noqa (should fix manually)
+]
+flake8-bandit.check-typed-exception = true
+pydocstyle.convention = "google"
+isort.known-first-party = ["tyranno"]
+flake8-tidy-imports.ban-relative-imports = "all"
+
+[tool.ruff.per-file-ignores]
+"tests/**/*" = [
+  "PLR2004",  # magic values
+  "S101",     # assert
+  "TID252",   # relative imports
+  "S105",     # Ignore checks for possible passwords
+  "S106",
+  "S107",
+  "S108",     # Harcoded temp file
+]

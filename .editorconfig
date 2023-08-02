@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to Tyranno
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyranno
+# SPDX-License-Identifier: Apache-2.0
+
+# Check https://editorconfig.org for more information
+# These are derived from https://ukupat.github.io/tabs-or-spaces/
+# The most majority indentation style was selected for each language
+root = true
+
+# In 2022, most languages are 2-space
+# We assume TypeScript to be 2-space because JavaScript and JSX so strongly are,
+# and we'd rather keep those two consistent.
+[*]
+end_of_line = lf
+charset = utf-8
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+# 4-space, traditionally compiled without bytecode or JIT --
+#   Julia, Rust, D, C++, Objective-C, C, Fortran, and Assembly
+# We exclude Fortran fixed-form (e.g. .f/.ftn); these have weird indentation rules
+# C++ is even between 4-space and 2-space, while C is even between 4-space and tab
+[*.{julia,rs,d,cpp,c,m,mm,f[0-9][0-9],inc,h,s,asm}]
+indent_size = 4
+
+# 4-space, generally VM --
+#   Erlang, F#, Python, PHP (in 8+), Java, Kotlin, Groovy (+Gradle), F#, erlang, Swift
+[*.{py,php,java,groovy,gradle,kt,kts,cs,fs,fsx,fsi,erl,swift}]
+indent_size = 4
+
+# 4-space, generally interpreted --
+#   Lua, Vala, Perl, PowerShell, Batch
+# Lua and Vala are about even between 4-space and tab
+[*.{lua,vala,pl,perl,ps1,bat}]
+indent_size = 4
+
+# tab-based --
+#   Go, Haxe, Verilog, System Verilog, SAS, and AutoIt
+[*.{go,hx,v,sv,sas,au3}]
+indent_style = tab
+
+# CSV-like
+[*.{tsv,tab,csv}]
+# do NOT add a newline or trim whitespace
+# indent_style=tab seems safer but is probably not necessary
+indent_style = tab
+trim_trailing_whitespace = false
+insert_final_newline = false
