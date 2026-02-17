@@ -10,6 +10,6 @@ setup(
             'rd_filters=rd_filters.rd_filters:main',
         ],
     },
-    install_requires=['pandas', 'docopt'],
+    install_requires=['pandas', 'docopt', 'rdkit'],
     include_package_data=True,
 )

@@ -1,0 +1,40 @@
+name: CI testing
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pytester:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Runner images: https://github.com/actions/runner-images
+        os: ["ubuntu-24.04"]
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv and setup python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          uv pip install -e .
+          uv pip install pytest
+
+      - name: Run tests
+        run: uv run pytest tests/ -v
+
+      - name: Minimize uv cache
+        run: uv cache prune --ci

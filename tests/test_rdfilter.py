@@ -1,5 +1,5 @@
 from rd_filters import rd_filters
-import pkg_resources
+from importlib import resources
 
 # these just stop on the first filter
 test_lint = [
@@ -50,10 +50,9 @@ test_inpharmatica = [
     ('NC=NO', 'Filter89_hydroxylamine > 0'),
     ('C(=O)NOS', 'Filter31_so_bond > 0'),
 ]
-         
+
 def test_hydrogen_suppression():
-    alert_file_name = pkg_resources.resource_filename('rd_filters',
-                                                      "data/alert_collection.csv")
+    alert_file_name = str(resources.files("rd_filters") / "data" / "alert_collection.csv")
     for rule_list, tests in [(["Inpharmatica"], test_inpharmatica),
                              (["LINT"], test_lint)]:
         rf = rd_filters.RDFilters(alert_file_name)

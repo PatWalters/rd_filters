@@ -11,7 +11,7 @@ import pandas as pd
 import os
 import json
 from docopt import docopt
-import pkg_resources
+from importlib import resources
 
 cmd_str = """Usage:
 rd_filters filter --in INPUT_FILE --prefix PREFIX [--rules RULES_FILE_NAME] [--alerts ALERT_FILE_NAME][--np NUM_CORES]
@@ -156,8 +156,9 @@ class RDFilters:
 
 def main():
     cmd_input = docopt(cmd_str)
-    alert_file_name = cmd_input.get("--alerts") or pkg_resources.resource_filename('rd_filters',
-                                                                                   "data/alert_collection.csv")
+    alert_file_name = cmd_input.get("--alerts") or str(
+        resources.files("rd_filters") / "data" / "alert_collection.csv"
+    )
     rf = RDFilters(alert_file_name)
 
     if cmd_input.get("template"):
@@ -166,7 +167,9 @@ def main():
 
     elif cmd_input.get("filter"):
         input_file_name = cmd_input.get("--in")
-        rules_file_name = cmd_input.get("--rules") or pkg_resources.resource_filename('rd_filters', "data/rules.json")
+        rules_file_name = cmd_input.get("--rules") or str(
+            resources.files("rd_filters") / "data" / "rules.json"
+        )
         rules_file_path = get_config_file(rules_file_name, "FILTER_RULES_DATA")
         prefix_name = cmd_input.get("--prefix")
         num_cores = cmd_input.get("--np") or mp.cpu_count()
@@ -193,7 +196,7 @@ def main():
             df.HBA.between(*rule_dict["HBA"]) &
             df.TPSA.between(*rule_dict["TPSA"]) &
             df.Rot.between(*rule_dict["Rot"])
-            ]
+        ]
         output_smiles_file = prefix_name + ".smi"
         output_csv_file = prefix_name + ".csv"
         df_ok[["SMILES", "NAME"]].to_csv(f"{output_smiles_file}", sep=" ", index=False, header=False)
